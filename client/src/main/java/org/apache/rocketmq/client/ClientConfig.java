@@ -186,6 +186,7 @@ public class ClientConfig {
 
     /**
      * Domain name mode access way does not support the delimiter(;), and only one domain name can be set.
+     * 域名模式访问方式不支持分隔符（；），只能设置一个域名。
      *
      * @param namesrvAddr name server address
      */

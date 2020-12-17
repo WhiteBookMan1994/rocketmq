@@ -47,6 +47,7 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
 
 /**
  * In most scenarios, this is the mostly recommended class to consume messages.
+ * 在大多数情况下，这是最推荐使用消息的类。
  * </p>
  *
  * Technically speaking, this push client is virtually a wrapper of the underlying pull service. Specifically, on
@@ -217,6 +218,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
 
     /**
      * Batch consumption size
+     * 批量消费消息量
      */
     private int consumeMessageBatchMaxSize = 1;
 

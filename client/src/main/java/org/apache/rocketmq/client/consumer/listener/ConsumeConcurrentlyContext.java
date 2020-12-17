@@ -28,6 +28,10 @@ public class ConsumeConcurrentlyContext {
      * -1,no retry,put into DLQ directly<br>
      * 0,broker control retry frequency<br>
      * >0,client control retry frequency
+     * 消息消费重试策略
+     * -1，不重试，直接扔进死信队列（DLQ，Dead-Letter Queue）
+     * 0，broker 控制重试频率
+     * >0，client 控制重试策略
      */
     private int delayLevelWhenNextConsume = 0;
     private int ackIndex = Integer.MAX_VALUE;

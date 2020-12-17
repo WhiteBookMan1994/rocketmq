@@ -560,6 +560,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
             MessageQueue mq = null;
             Exception exception = null;
             SendResult sendResult = null;
+            // 同步发送，发送失败会重试，最多重试两次。异步发送和oneway发送不重试
             int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 + this.defaultMQProducer.getRetryTimesWhenSendFailed() : 1;
             int times = 0;
             String[] brokersSent = new String[timesTotal];

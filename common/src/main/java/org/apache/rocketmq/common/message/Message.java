@@ -27,6 +27,7 @@ public class Message implements Serializable {
 
     private String topic;
     private int flag;
+    /**用户自定义的消息属性，这些属性可以供 SQL92 方式过滤消息使用*/
     private Map<String, String> properties;
     private byte[] body;
     private String transactionId;
