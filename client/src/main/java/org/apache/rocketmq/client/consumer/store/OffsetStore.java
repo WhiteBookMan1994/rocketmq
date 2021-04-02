@@ -65,9 +65,11 @@ public interface OffsetStore {
     Map<MessageQueue, Long> cloneOffsetTable(String topic);
 
     /**
-     * @param mq
-     * @param offset
-     * @param isOneway
+     * 同步消费消息偏移量 offset 到 broker
+     *
+     * @param mq 消息队列queue
+     * @param offset 偏移量
+     * @param isOneway 是否单向
      */
     void updateConsumeOffsetToBroker(MessageQueue mq, long offset, boolean isOneway) throws RemotingException,
         MQBrokerException, InterruptedException, MQClientException;

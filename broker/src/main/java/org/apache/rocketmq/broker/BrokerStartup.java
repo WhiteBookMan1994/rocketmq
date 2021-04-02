@@ -81,6 +81,10 @@ public class BrokerStartup {
         return null;
     }
 
+    /**
+     * 优雅停机
+     * @param controller
+     */
     public static void shutdown(final BrokerController controller) {
         if (null != controller) {
             controller.shutdown();

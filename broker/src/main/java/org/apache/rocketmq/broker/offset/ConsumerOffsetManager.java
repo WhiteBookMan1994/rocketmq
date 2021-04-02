@@ -33,10 +33,20 @@ import org.apache.rocketmq.logging.InternalLogger;
 import org.apache.rocketmq.logging.InternalLoggerFactory;
 import org.apache.rocketmq.remoting.protocol.RemotingSerializable;
 
+/**
+ * 消费消息偏移量 offset 的管理
+ * 集群消费模式：offset 保存在 broker，消费者端对应使用的是 RemoteBrokerOffsetStore 类
+ * 广播消费模式：offset 保存在消费者本地，消费者使用的是 LocalFileOffsetStore 类
+ */
 public class ConsumerOffsetManager extends ConfigManager {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.BROKER_LOGGER_NAME);
     private static final String TOPIC_GROUP_SEPARATOR = "@";
 
+    /**
+     * offsetTable：
+     * key 是 String 类型，"topic@group"，每个消息Topic对应的消费者组ConsumerGroup
+     * value 是ConcurrentHashMap<Integer,Long>类型，它的key 是对应每个队列的queueId，value 是对应的下一次消费开始的offset（该offset尚未消费）
+     */
     private ConcurrentMap<String/* topic@group */, ConcurrentMap<Integer, Long>> offsetTable =
         new ConcurrentHashMap<String, ConcurrentMap<Integer, Long>>(512);
 
@@ -158,9 +168,14 @@ public class ConsumerOffsetManager extends ConfigManager {
 
     @Override
     public String configFilePath() {
+        // 如果 consumerOffset.json 为空，则从备份文件 consumerOffset.json.bak 加载
         return BrokerPathConfigHelper.getConsumerOffsetPath(this.brokerController.getMessageStoreConfig().getStorePathRootDir());
     }
 
+    /**
+     * 从 json 文件中解析消息消费偏移量信息
+     * @param jsonString
+     */
     @Override
     public void decode(String jsonString) {
         if (jsonString != null) {

@@ -302,6 +302,7 @@ public interface MessageStore {
 
     /**
      * Check if the given message has been swapped out of the memory.
+     * 检查给定的消息是否已从内存中交换出去写到磁盘了
      *
      * @param topic topic.
      * @param queueId queue ID.

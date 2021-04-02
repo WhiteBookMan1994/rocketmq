@@ -344,10 +344,12 @@ public class BrokerController {
                 }
             }, initialDelay, period, TimeUnit.MILLISECONDS);
 
+            // broker 启动10s后，默认每隔5s钟持久化一次消费消息偏移量offset信息
             this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
                     try {
+                        // 持久化消费偏移量，将 ConsumerOffsetManager 序列化为json文件保存在本地
                         BrokerController.this.consumerOffsetManager.persist();
                     } catch (Throwable e) {
                         log.error("schedule persist consumerOffset error.", e);
@@ -798,6 +800,7 @@ public class BrokerController {
             this.brokerOuterAPI.shutdown();
         }
 
+        //优雅停机shutdown时会持久化消费偏移量信息到本地
         this.consumerOffsetManager.persist();
 
         if (this.filterServerManager != null) {
