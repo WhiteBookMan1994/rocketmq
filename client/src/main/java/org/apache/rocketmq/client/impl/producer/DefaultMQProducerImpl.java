@@ -565,6 +565,8 @@ public class DefaultMQProducerImpl implements MQProducerInner {
             int times = 0;
             String[] brokersSent = new String[timesTotal];
             for (; times < timesTotal; times++) {
+                //这里注意，第一次消费的时候 mq 是 null，lastBrokerName = null；
+                //如果消费失败，后续消费 lastBrokerName 就是上次发送失败的 brokerName
                 String lastBrokerName = null == mq ? null : mq.getBrokerName();
                 MessageQueue mqSelected = this.selectOneMessageQueue(topicPublishInfo, lastBrokerName);
                 if (mqSelected != null) {

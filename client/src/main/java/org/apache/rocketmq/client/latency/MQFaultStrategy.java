@@ -55,7 +55,14 @@ public class MQFaultStrategy {
         this.sendLatencyFaultEnable = sendLatencyFaultEnable;
     }
 
+    /**
+     *
+     * @param tpInfo
+     * @param lastBrokerName 上次发送失败的Broker
+     * @return
+     */
     public MessageQueue selectOneMessageQueue(final TopicPublishInfo tpInfo, final String lastBrokerName) {
+        //这里有一个 sendLatencyFaultEnable 开关变量，如果开启，在随机递增取模的基础上，再过滤掉not available的Broker
         if (this.sendLatencyFaultEnable) {
             try {
                 int index = tpInfo.getSendWhichQueue().getAndIncrement();
@@ -64,12 +71,17 @@ public class MQFaultStrategy {
                     if (pos < 0)
                         pos = 0;
                     MessageQueue mq = tpInfo.getMessageQueueList().get(pos);
+                    //判断上面取模运算轮询得到的 brokerName 是否在延迟列表中
                     if (latencyFaultTolerance.isAvailable(mq.getBrokerName())) {
+                        // 第一个 || 条件：非失败重试，直接返回到的队列
+                        // 第二个 || 条件：失败重试的情况，如果和选择的队列是上次重试是一样的，则返回
+                        // 这里需要注意，在开启了sendLatencyFaultEnable的情况下，无论上次lastBrokerName是否发送成功
+                        // lastBrokerName 对应的broker都会放入到latencyFaultTolerance中去
                         if (null == lastBrokerName || mq.getBrokerName().equals(lastBrokerName))
                             return mq;
                     }
                 }
-
+                //上面没有选出Queue，需要再选出一个broker
                 final String notBestBroker = latencyFaultTolerance.pickOneAtLeast();
                 int writeQueueNums = tpInfo.getQueueIdByBroker(notBestBroker);
                 if (writeQueueNums > 0) {
@@ -85,10 +97,10 @@ public class MQFaultStrategy {
             } catch (Exception e) {
                 log.error("Error occurred when selecting message queue", e);
             }
-
+            //(index ++ ) % queues.size 取模运算选出一个queue
             return tpInfo.selectOneMessageQueue();
         }
-
+        //如果 sendLatencyFaultEnable = false，则
         return tpInfo.selectOneMessageQueue(lastBrokerName);
     }
 

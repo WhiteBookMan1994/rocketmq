@@ -76,6 +76,7 @@ public class TopicPublishInfo {
                 if (pos < 0)
                     pos = 0;
                 MessageQueue mq = this.messageQueueList.get(pos);
+                // 去掉上次发送失败的 broker 上的 queue
                 if (!mq.getBrokerName().equals(lastBrokerName)) {
                     return mq;
                 }
